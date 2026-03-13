@@ -1,8 +1,9 @@
 """
 Feature Map & Solar Eclipse Analyzer  +  CMD Plot
-ผู้พัฒนา: วิทชภณ พวงแก้ว
+ครุที่ปรึกษา: วิทชภณ พวงแก้ว
+Developed by: Sitthichokthq (https://github.com/Sitthichokthq) and (sitthichokthq.web.app)
 
-CMD Plot อยู่ในแผงขวาแบบ Tab — ใช้ภาพ Filtered ที่โหลดไว้แล้ว
+
 """
 
 import cv2
@@ -124,8 +125,7 @@ def align_and_median_combine(paths):
         img = cv2.imread(p)
         if img is None: continue
         g = cv2.GaussianBlur(cv2.cvtColor(img,cv2.COLOR_BGR2GRAY),(5,5),0)
-        c = cv2.HoughCircles(g,cv2.HOUGH_GRADIENT,1.2,100,param1=100,param2=50,
-                             minRadius=50,maxRadius=int(min(img.shape[:2])/2))
+        c = cv2.HoughCircles(g,cv2.HOUGH_GRADIENT,1.2,100,param1=100,param2=50,minRadius=50,maxRadius=int(min(img.shape[:2])/2))
         if c is not None:
             x = np.uint16(np.around(c))[0,0]
             crs.append((x[0],x[1],x[2])); images.append(img)
@@ -336,8 +336,8 @@ def phot_detect(gray8, bkg, thresh_sigma=4.0, ap_r=5,
 class App:
     def __init__(self, root):
         self.root = root
-        self.root.title("Feature Map & Eclipse Analyzer  —  วิทชภณ พวงแก้ว")
-        self.root.geometry("1760x980")
+        self.root.title("Feature Map & Eclipse Analyzer")
+        self.root.geometry("1920x1080")
         self.root.configure(bg=T["bg"])
 
         self.img_orig     = None
@@ -384,22 +384,18 @@ class App:
             tk.Frame(hdr, bg=T["border"], width=1).pack(
                 side=tk.LEFT, fill=tk.Y, padx=5, pady=10)
 
-        self._hbtn(hdr,"Open Image",   self.load_image,   "accent").pack(side=tk.LEFT,padx=(8,0),pady=10)
-        self._hbtn(hdr,"Open Eclipse", self.eclipse_open, "accent").pack(side=tk.LEFT,padx=3,    pady=10)
+        self._hbtn(hdr,"Open Image",   self.load_image,   "accent").pack(side=tk.LEFT,padx=(6,0),pady=10)
         sep()
 
-        tk.Label(hdr,text="Filter",bg=T["panel"],fg=T["fg2"],
-                 font=("Helvetica",8)).pack(side=tk.LEFT,padx=(0,3))
+        tk.Label(hdr,text="Filter",bg=T["panel"],fg=T["fg2"],font=("Helvetica",16)).pack(side=tk.LEFT,padx=(0,3))
         self.filter_var = tk.StringVar(value=FILTERS[0])
-        cb = ttk.Combobox(hdr,textvariable=self.filter_var,values=FILTERS,
-                          width=14,state="readonly",font=("Helvetica",9))
+        cb = ttk.Combobox(hdr,textvariable=self.filter_var,values=FILTERS,width=14,state="readonly",font=("Helvetica",16))
         cb.pack(side=tk.LEFT,pady=12)
         cb.bind("<<ComboboxSelected>>",lambda _:self.refresh_filter())
         sep()
 
         self._tool_btns = {}
-        for key,lbl in [("measure","Measure"),("roi","ROI"),
-                         ("inspect","Inspect"),("pan","Pan")]:
+        for key,lbl in [("measure","Measure"),("roi","ROI"),("inspect","Inspect"),("pan","Pan")]:
             b = self._hbtn(hdr,lbl,lambda k=key:self.set_tool(k),"tool")
             b.pack(side=tk.LEFT,padx=2,pady=10)
             self._tool_btns[key] = b
@@ -410,37 +406,21 @@ class App:
         sep()
 
         self._hbtn(hdr,"Analyze Eclipse",self.eclipse_analyze,"warning").pack(side=tk.LEFT,padx=3,pady=10)
-        tk.Label(hdr,text="u",bg=T["panel"],fg=T["fg2"],
-                 font=("Helvetica",8)).pack(side=tk.LEFT,padx=(6,1))
-        self.limb_u = tk.Scale(hdr,from_=0,to=100,orient=tk.HORIZONTAL,
-                               length=60,bg=T["panel"],fg=T["fg"],
-                               highlightthickness=0,troughcolor=T["border"],
-                               font=("Helvetica",7),bd=0,sliderlength=12)
+        tk.Label(hdr,text="u",bg=T["panel"],fg=T["fg2"],font=("Helvetica",16)).pack(side=tk.LEFT,padx=(6,1))
+        self.limb_u = tk.Scale(hdr,from_=0,to=100,orient=tk.HORIZONTAL,length=60,bg=T["panel"],fg=T["fg"], highlightthickness=0,troughcolor=T["border"], font=("Helvetica",7),bd=0,sliderlength=12)
         self.limb_u.set(80)
         self.limb_u.pack(side=tk.LEFT,pady=10)
         sep()
 
         # CMD controls inline in header
-        tk.Label(hdr,text="σ:",bg=T["panel"],fg=T["fg2"],
-                 font=("Helvetica",8)).pack(side=tk.LEFT,padx=(0,1))
-        tk.Spinbox(hdr,from_=1,to=20,increment=0.5,format="%.1f",
-                   textvariable=self._cmd_thresh,width=4,
-                   font=("Menlo",8),bg=T["panel2"],fg=T["fg"],
-                   buttonbackground=T["panel2"],relief=tk.FLAT,bd=0,
-                   highlightthickness=1,highlightbackground=T["border"]
-                   ).pack(side=tk.LEFT,pady=12)
-        tk.Label(hdr,text="ap:",bg=T["panel"],fg=T["fg2"],
-                 font=("Helvetica",8)).pack(side=tk.LEFT,padx=(4,1))
-        tk.Spinbox(hdr,from_=2,to=20,textvariable=self._cmd_ap,width=3,
-                   font=("Menlo",8),bg=T["panel2"],fg=T["fg"],
-                   buttonbackground=T["panel2"],relief=tk.FLAT,bd=0,
-                   highlightthickness=1,highlightbackground=T["border"]
-                   ).pack(side=tk.LEFT,pady=12)
+        tk.Label(hdr,text="σ:",bg=T["panel"],fg=T["fg2"],font=("Helvetica",16)).pack(side=tk.LEFT,padx=(0,1))
+        tk.Spinbox(hdr,from_=1,to=20,increment=0.5,format="%.1f",textvariable=self._cmd_thresh,width=4,font=("Menlo",8),bg=T["panel2"],fg=T["fg"],buttonbackground=T["panel2"],relief=tk.FLAT,bd=0,highlightthickness=1,highlightbackground=T["border"]).pack(side=tk.LEFT,pady=12)
+        tk.Label(hdr,text="ap:",bg=T["panel"],fg=T["fg2"],font=("Helvetica",16)).pack(side=tk.LEFT,padx=(4,1))
+        tk.Spinbox(hdr,from_=2,to=20,textvariable=self._cmd_ap,width=3,font=("Menlo",8),bg=T["panel2"],fg=T["fg"],buttonbackground=T["panel2"],relief=tk.FLAT,bd=0,highlightthickness=1,highlightbackground=T["border"]).pack(side=tk.LEFT,pady=12)
         self._hbtn(hdr,"▶ Detect Stars",self.run_cmd,"accent2").pack(side=tk.LEFT,padx=4,pady=10)
         sep()
 
-        self.lbl_status = tk.Label(hdr,text="No image loaded",
-                                   bg=T["panel"],fg=T["fg2"],font=("Helvetica",8))
+        self.lbl_status = tk.Label(hdr,text="No image loaded",bg=T["panel"],fg=T["fg2"],font=("Helvetica",8))
         self.lbl_status.pack(side=tk.LEFT,padx=6)
         self._hbtn(hdr,"Clear",self._clear_all,"danger").pack(side=tk.RIGHT,padx=8,pady=10)
 
@@ -502,25 +482,21 @@ class App:
         sb = tk.Frame(self.root,bg=T["button"],height=20)
         sb.pack(fill=tk.X)
         sb.pack_propagate(False)
-        self.lbl_cursor = tk.Label(sb,text="  x=—  y=—",anchor="w",
-                                   bg=T["button"],fg=T["button_fg"],font=("Menlo",7))
+        self.lbl_cursor = tk.Label(sb,text="  x=—  y=—",anchor="w",bg=T["button"],fg=T["button_fg"],font=("Menlo",7))
         self.lbl_cursor.pack(side=tk.LEFT)
-        self.lbl_zoom = tk.Label(sb,text="1.00x  ",anchor="e",
-                                 bg=T["button"],fg=T["button_fg"],font=("Menlo",7))
+        self.lbl_zoom = tk.Label(sb,text="1.00x  ",anchor="e",bg=T["button"],fg=T["button_fg"],font=("Menlo",7))
         self.lbl_zoom.pack(side=tk.RIGHT)
 
     # ── Profiles tab ──────────────────────────────────
 
     def _build_profiles_tab(self, parent):
         self._fig_prof = Figure(figsize=(5,5.5),facecolor=T["plot_bg"])
-        self._fig_prof.subplots_adjust(hspace=0.6,wspace=0.4,
-                                       top=0.92,bottom=0.08,left=0.13,right=0.97)
+        self._fig_prof.subplots_adjust(hspace=0.6,wspace=0.4,top=0.92,bottom=0.08,left=0.13,right=0.97)
         self._ax_outer  = self._fig_prof.add_subplot(2,2,1)
         self._ax_inner  = self._fig_prof.add_subplot(2,2,2)
         self._ax_radial = self._fig_prof.add_subplot(2,2,3)
         self._ax_hist   = self._fig_prof.add_subplot(2,2,4)
-        for ax,t in [(self._ax_outer,"Outer Edge"),(self._ax_inner,"Inner Edge"),
-                     (self._ax_radial,"Radial Profile"),(self._ax_hist,"Histogram")]:
+        for ax,t in [(self._ax_outer,"Outer Edge"),(self._ax_inner,"Inner Edge"),(self._ax_radial,"Radial Profile"),(self._ax_hist,"Histogram")]:
             dax(ax,t)
         self._cv_prof = FigureCanvasTkAgg(self._fig_prof,master=parent)
         self._cv_prof.draw()
@@ -534,21 +510,14 @@ class App:
         bar.pack(fill=tk.X); bar.pack_propagate(False)
 
         def lbl(t):
-            tk.Label(bar,text=t,bg=T["panel2"],fg=T["fg2"],
-                     font=("Helvetica",7)).pack(side=tk.LEFT,padx=(6,1),pady=5)
+            tk.Label(bar,text=t,bg=T["panel2"],fg=T["fg2"],font=("Helvetica",7)).pack(side=tk.LEFT,padx=(6,1),pady=5)
 
         lbl("Tip mT:")
-        tk.Spinbox(bar,from_=-30,to=30,increment=0.01,format="%.3f",
-                   textvariable=self._cmd_tip,width=7,
-                   font=("Menlo",7),bg=T["panel"],fg=T["fg"],
-                   buttonbackground=T["panel"],relief=tk.FLAT,bd=0,
-                   highlightthickness=1,highlightbackground=T["border"]
-                   ).pack(side=tk.LEFT,pady=3)
+        tk.Spinbox(bar,from_=-30,to=30,increment=0.01,format="%.3f",textvariable=self._cmd_tip,width=7,font=("Menlo",7),bg=T["panel"],fg=T["fg"],buttonbackground=T["panel"],relief=tk.FLAT,bd=0,highlightthickness=1,highlightbackground=T["border"]).pack(side=tk.LEFT,pady=3)
         self._hbtn(bar,"Set",self._cmd_redraw,"warning").pack(side=tk.LEFT,padx=3,pady=3)
         tk.Frame(bar,bg=T["border"],width=1).pack(side=tk.LEFT,fill=tk.Y,padx=5,pady=3)
         lbl("Style:")
-        cb2 = ttk.Combobox(bar,textvariable=self._cmd_style,state="readonly",
-                           values=["Dark","White"],width=7,font=("Helvetica",7))
+        cb2 = ttk.Combobox(bar,textvariable=self._cmd_style,state="readonly",values=["Dark","White"],width=7,font=("Helvetica",7))
         cb2.pack(side=tk.LEFT,pady=3)
         cb2.bind("<<ComboboxSelected>>",lambda _:self._cmd_redraw())
         self._hbtn(bar,"Save PNG",self._cmd_save,"tool").pack(side=tk.RIGHT,padx=6,pady=3)
@@ -587,9 +556,7 @@ class App:
         s.configure("TNotebook",background=T["bg"],borderwidth=0,tabmargins=0)
         s.configure("TNotebook.Tab",background=T["panel"],foreground=T["fg2"],
                     padding=(10,4),font=("Helvetica",9),borderwidth=0)
-        s.map("TNotebook.Tab",
-              background=[("selected",T["tab_sel"])],
-              foreground=[("selected",T["fg"])])
+        s.map("TNotebook.Tab",background=[("selected",T["tab_sel"])],foreground=[("selected",T["fg"])])
         self._hi_tool("measure")
 
     # ══════════════════════════════════════════════════
@@ -597,21 +564,14 @@ class App:
     # ══════════════════════════════════════════════════
 
     def _lframe(self,parent,title):
-        f = tk.Frame(parent,bg=T["panel"],
-                     highlightbackground=T["border"],highlightthickness=1)
-        tk.Label(f,text=title.upper(),bg=T["panel"],fg=T["fg2"],
-                 font=("TH Sarabun New",16,"bold"),padx=6,pady=3).pack(anchor="w")
+        f = tk.Frame(parent,bg=T["panel"],highlightbackground=T["border"],highlightthickness=1)
+        tk.Label(f,text=title.upper(),bg=T["panel"],fg=T["fg2"],font=("TH Sarabun New",16,"bold"),padx=6,pady=3).pack(anchor="w")
         return f
 
     def _hbtn(self,parent,text,cmd,style="tool"):
-        c = {"accent":(T["accent"],T["bg"]),"accent2":(T["accent2"],T["bg"]),
-             "success":(T["success"],T["bg"]),"warning":(T["warning"],T["bg"]),
-             "danger":(T["danger"],T["bg"]),"tool":(T["panel2"],T["fg"])}
+        c = {"accent":(T["accent"],T["bg"]),"accent2":(T["accent2"],T["bg"]),"success":(T["success"],T["bg"]),"warning":(T["warning"],T["bg"]),"danger":(T["danger"],T["bg"]),"tool":(T["panel2"],T["fg"])}
         bg,fg = c.get(style,(T["panel2"],T["fg"]))
-        return tk.Button(parent,text=text,command=cmd,bg=bg,fg=fg,
-                         activebackground=T["border"],activeforeground=T["fg"],
-                         font=("Helvetica",9),relief=tk.FLAT,cursor="hand2",
-                         padx=9,pady=3,bd=0,highlightthickness=0)
+        return tk.Button(parent,text=text,command=cmd,bg=bg,fg=fg,activebackground=T["border"],activeforeground=T["fg"],font=("Helvetica",9),relief=tk.FLAT,cursor="hand2", padx=9,pady=3,bd=0,highlightthickness=0)
 
     # ══════════════════════════════════════════════════
     #  Load / Filter
@@ -666,19 +626,14 @@ class App:
             messagebox.showwarning("","Open an image first"); return
         gray = cv2.cvtColor(self.img_orig,cv2.COLOR_RGB2GRAY)
         blur = cv2.GaussianBlur(gray,(9,9),2); h,w=gray.shape
-        circles = cv2.HoughCircles(blur,cv2.HOUGH_GRADIENT,dp=1.2,
-                                   minDist=max(20,min(h,w)//8),
-                                   param1=60,param2=30,
-                                   minRadius=max(8,min(h,w)//30),
-                                   maxRadius=min(h,w)//2)
+        circles = cv2.HoughCircles(blur,cv2.HOUGH_GRADIENT,dp=1.2,minDist=max(20,min(h,w)//8),param1=60,param2=30,minRadius=max(8,min(h,w)//30),maxRadius=min(h,w)//2)
         if circles is None: messagebox.showinfo("","No circles detected"); return
         circles = np.round(circles[0]).astype(int)
         circles = circles[circles[:,2].argsort()[::-1]]
         self.outer_circle = tuple(circles[0])
         self.inner_circle = tuple(circles[1]) if len(circles)>=2 else None
         self._log_circles(); self._update_basic_plots(); self._redraw()
-        self._status(f"Outer r={circles[0][2]}px"+
-                     (f"  Inner r={circles[1][2]}px" if len(circles)>=2 else ""),T["success"])
+        self._status(f"Outer r={circles[0][2]}px"+ (f"  Inner r={circles[1][2]}px" if len(circles)>=2 else ""),T["success"])
 
     def sobel_fit(self):
         if self.img_orig is None: return
@@ -687,8 +642,7 @@ class App:
         sx = cv2.Sobel(blur,cv2.CV_64F,1,0,ksize=3)
         sy = cv2.Sobel(blur,cv2.CV_64F,0,1,ksize=3)
         mag = np.sqrt(sx**2+sy**2)
-        for thr,hi,attr in [(np.percentile(mag,97),None,"outer_circle"),
-                             (np.percentile(mag,94),np.percentile(mag,97),"inner_circle")]:
+        for thr,hi,attr in [(np.percentile(mag,97),None,"outer_circle"),(np.percentile(mag,94),np.percentile(mag,97),"inner_circle")]:
             mask=((mag>=thr) if hi is None else ((mag>=thr)&(mag<hi))).astype(np.uint8)
             ys2,xs2=np.where(mask>0)
             if len(xs2)<6: continue
@@ -713,13 +667,10 @@ class App:
                 if img is None: raise RuntimeError("Alignment failed")
                 cx,cy,r_moon=info
             else:
-                img=(cv2.cvtColor(self.img_orig,cv2.COLOR_RGB2BGR)
-                     if self.img_orig is not None else cv2.imread(self.eclipse_paths[0]))
+                img=(cv2.cvtColor(self.img_orig,cv2.COLOR_RGB2BGR)if self.img_orig is not None else cv2.imread(self.eclipse_paths[0]))
                 if img is None: raise RuntimeError("Cannot load image")
                 g=cv2.GaussianBlur(cv2.cvtColor(img,cv2.COLOR_BGR2GRAY),(5,5),0)
-                c=cv2.HoughCircles(g,cv2.HOUGH_GRADIENT,1.2,100,
-                                   param1=100,param2=50,minRadius=50,
-                                   maxRadius=int(min(img.shape[:2])/2))
+                c=cv2.HoughCircles(g,cv2.HOUGH_GRADIENT,1.2,100,param1=100,param2=50,minRadius=50,maxRadius=int(min(img.shape[:2])/2))
                 if c is None: raise RuntimeError("Moon not detected")
                 x=np.uint16(np.around(c))[0,0]
                 cx,cy,r_moon=int(x[0]),int(x[1]),int(x[2])
@@ -729,8 +680,7 @@ class App:
             if res["o_r"]>0: self.outer_circle=(int(res["o_cx"]),int(res["o_cy"]),int(res["o_r"]))
             if res["i_r"]>0: self.inner_circle=(int(res["i_cx"]),int(res["i_cy"]),int(res["i_r"]))
             self._log_eclipse(); self._update_eclipse_plots(); self._redraw()
-            self._status(f"Outer {res['o_r_km']:,.0f} km  Inner {res['i_r_km']:,.0f} km"
-                         f"  err {res['err_r']:.2f}%",T["success"])
+            self._status(f"Outer {res['o_r_km']:,.0f} km  Inner {res['i_r_km']:,.0f} km"f"  err {res['err_r']:.2f}%",T["success"])
         except Exception as e:
             messagebox.showerror("Error",str(e)); self._status("Analysis failed",T["danger"])
 
@@ -745,9 +695,7 @@ class App:
         try:
             gray = self.img_filtered
             bkg  = phot_background(gray, box=max(32,min(gray.shape)//16))
-            cat  = phot_detect(gray,bkg,
-                               thresh_sigma=self._cmd_thresh.get(),
-                               ap_r=self._cmd_ap.get())
+            cat  = phot_detect(gray,bkg,thresh_sigma=self._cmd_thresh.get(),ap_r=self._cmd_ap.get())
             if cat is None:
                 raise RuntimeError("ตรวจไม่พบดาว — ลด threshold σ หรือเพิ่ม aperture")
             self._cmd_cat = cat
@@ -756,9 +704,7 @@ class App:
             self._nb.select(1)
             self._status(f"Found {len(cat['x']):,} stars from filtered image",T["success"])
             self._lbl_cmd_info.config(
-                text=(f"  N={len(cat['x']):,} stars  |  "
-                      f"filter={self.filter_var.get()}  σ={self._cmd_thresh.get():.1f}  "
-                      f"ap={self._cmd_ap.get()}px"),
+                text=(f"  N={len(cat['x']):,} stars  |  "f"filter={self.filter_var.get()}  σ={self._cmd_thresh.get():.1f}  "f"ap={self._cmd_ap.get()}px"),
                 fg=T["success"])
             self._redraw()   # show star markers on filtered canvas
         except Exception as e:
@@ -778,8 +724,7 @@ class App:
             transform=self._ax_c1.transAxes,ha="center",va="center",
             color=T["fg2"],fontsize=10,
             bbox=dict(boxstyle="round,pad=0.8",fc=T["panel2"],ec=T["border"],alpha=0.9))
-        self._fig_cmd.suptitle("CMD — Color-Magnitude Diagram",
-                               color=T["fg"],fontsize=9,fontweight="bold")
+        self._fig_cmd.suptitle("CMD — Color-Magnitude Diagram",color=T["fg"],fontsize=9,fontweight="bold")
         self._cv_cmd.draw_idle()
 
     def _cmd_redraw(self):
@@ -822,12 +767,8 @@ class App:
             dens = np.ones(len(idx))
 
         bg_mask = np.ones(len(mag),bool); bg_mask[idx]=False
-        ax.scatter(ci[bg_mask],mag[bg_mask],
-                   s=0.4,c="#333355" if not pub else "#d0d0d0",
-                   alpha=0.25,rasterized=True)
-        ax.scatter(ci[idx],mag[idx],
-                   s=1.0,c=dens,cmap="inferno" if not pub else "Blues",
-                   alpha=0.85,rasterized=True,linewidths=0)
+        ax.scatter(ci[bg_mask],mag[bg_mask],s=0.4,c="#333355" if not pub else "#d0d0d0",alpha=0.25,rasterized=True)
+        ax.scatter(ci[idx],mag[idx],s=1.0,c=dens,cmap="inferno" if not pub else "Blues",alpha=0.85,rasterized=True,linewidths=0)
 
         if tip!=0:
             ax.axhline(tip,color=gray_c,lw=1.4)
@@ -861,8 +802,7 @@ class App:
                 ci_p84[k]=np.percentile(ci[sel],84)
         ok=~np.isnan(ci_med)
         for i in np.where(ok)[0]:
-            ax2.plot([ci_p16[i],ci_p84[i]],[mid_m[i],mid_m[i]],
-                     color="#444466" if not pub else "#aaaaaa",lw=0.8,alpha=0.5)
+            ax2.plot([ci_p16[i],ci_p84[i]],[mid_m[i],mid_m[i]],color="#444466" if not pub else "#aaaaaa",lw=0.8,alpha=0.5)
         ax2.plot(ci_med[ok],mid_m[ok],color=red_c,lw=2.2)
         if tip!=0: ax2.axhline(tip,color=gray_c,lw=1.4)
         ax2.set_xlabel("CI",color=fg_c,fontsize=8)
@@ -876,8 +816,7 @@ class App:
         mid_lf=(edges[:-1]+edges[1:])/2
         sm=gaussian_filter1d(counts.astype(float),sigma=1.5)
         ax3.plot(sm,mid_lf,color=fg_c,lw=1.6,drawstyle="steps-mid")
-        ax3.fill_betweenx(mid_lf,0,sm,alpha=0.18,
-                          color="black" if pub else T["fg"])
+        ax3.fill_betweenx(mid_lf,0,sm,alpha=0.18,color="black" if pub else T["fg"])
         if tip!=0: ax3.axhline(tip,color=gray_c,lw=1.4)
         ax3.invert_xaxis()
         ax3.set_xlabel("N",color=fg_c,fontsize=8)
@@ -901,9 +840,7 @@ class App:
             filetypes=[("PNG","*.png"),("PDF","*.pdf"),("SVG","*.svg")])
         if not path: return
         pub=self._cmd_style.get()=="White"
-        self._fig_cmd.savefig(path,dpi=200 if pub else 150,
-                              facecolor=self._fig_cmd.get_facecolor(),
-                              bbox_inches="tight")
+        self._fig_cmd.savefig(path,dpi=200 if pub else 150,facecolor=self._fig_cmd.get_facecolor(),bbox_inches="tight")
         self._lbl_cmd_info.config(text=f"  Saved: {path.split('/')[-1]}",fg=T["success"])
 
     # ══════════════════════════════════════════════════
@@ -911,8 +848,7 @@ class App:
     # ══════════════════════════════════════════════════
 
     def _clear_profiles(self):
-        for ax,t in [(self._ax_outer,"Outer Edge"),(self._ax_inner,"Inner Edge"),
-                     (self._ax_radial,"Radial Profile"),(self._ax_hist,"Histogram")]:
+        for ax,t in [(self._ax_outer,"Outer Edge"),(self._ax_inner,"Inner Edge"),(self._ax_radial,"Radial Profile"),(self._ax_hist,"Histogram")]:
             ax.cla(); dax(ax,t)
         self._cv_prof.draw_idle()
 
@@ -959,8 +895,7 @@ class App:
         self._ax_radial.legend(fontsize=6,labelcolor=T["fg"])
         self._ax_hist.cla(); dax(self._ax_hist,"Histogram","I","n")
         if self.img_filtered is not None:
-            self._ax_hist.hist(self.img_filtered.flatten(),bins=64,range=(0,256),
-                               color=T["accent2"],alpha=0.8,edgecolor="none")
+            self._ax_hist.hist(self.img_filtered.flatten(),bins=64,range=(0,256),color=T["accent2"],alpha=0.8,edgecolor="none")
         self._cv_prof.draw_idle()
 
     def _update_eclipse_plots(self):
@@ -1045,12 +980,10 @@ class App:
             draw.line([s1,s2],fill="#ffffff",width=2)
             for pt in (s1,s2): draw.ellipse([pt[0]-4,pt[1]-4,pt[0]+4,pt[1]+4],fill=T["danger"])
             km=f"  {d*self.eclipse['km_pp']:.0f}km" if self.eclipse else ""
-            draw.text(((s1[0]+s2[0])//2+4,(s1[1]+s2[1])//2-12),
-                      f"{d:.1f}px{km}",fill=T["warning"])
+            draw.text(((s1[0]+s2[0])//2+4,(s1[1]+s2[1])//2-12),f"{d:.1f}px{km}",fill=T["warning"])
         if self.roi:
             x1,y1,x2,y2=self.roi
-            draw.rectangle([int(x1*sc),int(y1*sc),int(x2*sc),int(y2*sc)],
-                           outline=T["success"],width=2)
+            draw.rectangle([int(x1*sc),int(y1*sc),int(x2*sc),int(y2*sc)],outline=T["success"],width=2)
         self._draw_rings(draw,sc)
         if self._drawing and self._pt_start and self._pt_end:
             s1=(int(self._pt_start[0]*sc),int(self._pt_start[1]*sc))
@@ -1064,8 +997,7 @@ class App:
                                 (self.inner_circle,T["inner"],"inner")]:
             if circle is None: continue
             cx,cy,r=circle; scx,scy,sr=int(cx*sc),int(cy*sc),int(r*sc)
-            pts=[(scx+int(sr*math.cos(2*math.pi*i/360)),
-                  scy+int(sr*math.sin(2*math.pi*i/360))) for i in range(361)]
+            pts=[(scx+int(sr*math.cos(2*math.pi*i/360)),scy+int(sr*math.sin(2*math.pi*i/360))) for i in range(361)]
             draw.line(pts,fill=col,width=2)
             draw.line([(scx-8,scy),(scx+8,scy)],fill=col,width=1)
             draw.line([(scx,scy-8),(scx,scy+8)],fill=col,width=1)
@@ -1145,14 +1077,12 @@ class App:
 
     def set_tool(self,t):
         self.tool=t; self.measure=None; self._hi_tool(t)
-        self.cv_filt.config(cursor={"measure":"crosshair","roi":"sizing",
-                                     "inspect":"tcross","pan":"fleur"}.get(t,"arrow"))
+        self.cv_filt.config(cursor={"measure":"crosshair","roi":"sizing","inspect":"tcross","pan":"fleur"}.get(t,"arrow"))
         self._redraw()
 
     def _hi_tool(self,active):
         for k,b in self._tool_btns.items():
-            b.config(bg=T["accent"] if k==active else T["panel2"],
-                     fg=T["bg"]    if k==active else T["fg"])
+            b.config(bg=T["accent"] if k==active else T["panel2"], fg=T["bg"]    if k==active else T["fg"])
 
     def _clear_all(self):
         self.outer_circle=self.inner_circle=self.roi=self.measure=self.eclipse=None
@@ -1166,8 +1096,7 @@ class App:
         km=""
         if self.eclipse:
             k=self.eclipse["km_pp"]; km=f"\nW {(x2-x1)*k:,.1f} km  H {(y2-y1)*k:,.1f} km"
-        self._log(f"ROI\n{'-'*24}\n({x1},{y1})–({x2},{y2})\n{x2-x1}×{y2-y1} px{km}\n"
-                  f"Mean {crop.mean():.1f}  Std {crop.std():.1f}\nRange {crop.min()}–{crop.max()}")
+        self._log(f"ROI\n{'-'*24}\n({x1},{y1})–({x2},{y2})\n{x2-x1}×{y2-y1} px{km}\n" f"Mean {crop.mean():.1f}  Std {crop.std():.1f}\nRange {crop.min()}–{crop.max()}")
 
     def _show_pixel(self,pt):
         x,y=pt; h,w=self.img_filtered.shape
